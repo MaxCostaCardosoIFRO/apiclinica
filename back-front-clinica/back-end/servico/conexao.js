@@ -4,7 +4,7 @@ const pool = mysql.createPool({
   host: "localhost",
   user: "apimedico",
   password: "Suporte99",
-  database: "API_Clinica",
+  database: "clinica",
 });
 
 export default pool;
