@@ -1,11 +1,14 @@
 import express from "express";
 import {
-  apresentartudo,
-  apresentarMedicoNome,
-  apresentarMedicoEspecialidade,
-} from "./servico/retornarMedicos_servico.js";
+  listarTodosMedicos,
+  filtrarMedicosPorNome,
+  filtrarMedicosPorEspecialidade,
+} from "./servico/retornaMedicos_servico.js";
 import pool from "./servico/conexao.js";
+
 const app = express();
+
+////////////////////////////////////////////////////////////
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
@@ -21,29 +24,42 @@ app.use((req, res, next) => {
   next();
 });
 
+////////////////////////////////////////////////////////////
+
 app.get("/medicos", async (req, res) => {
-  const nome = req.query.nome;
-  const especialidade = req.query.especialidade;
-  let resposta;
-  if (typeof nome === "undefined" && typeof especialidade === "undefined") {
-    resposta = await apresentartudo();
-  } else if (typeof nome !== "undefined") {
-    resposta = await apresentarMedicoNome(nome);
-  } else if (typeof especialidade !== "undefined") {
-    resposta = await apresentarMedicoEspecialidade(especialidade);
-  }
-  if (resposta.length > 0) {
-    res.json(resposta);
-  } else {
-    res.status(404).json({ mensagem: "Nenhum médico encontrado" });
+  const { nome, especialidade } = req.query;
+  let resultado;
+
+  try {
+    if (!nome && !especialidade) {
+      resultado = await listarTodosMedicos();
+    } else if (nome) {
+      resultado = await filtrarMedicosPorNome(nome);
+    } else if (especialidade) {
+      resultado = await filtrarMedicosPorEspecialidade(especialidade);
+    }
+
+    res.json(resultado);
+  } catch (error) {
+    res.status(404).json({ erro: error.message });
   }
 });
 
-app.listen(9000, async () => {
-  const data = new Date();
-  console.log("Servidor iniciado na porta 9000", data);
+//////////////////////////////////////////////////////////////
+app.use((req, res, next) => {
+  res.status(404).json({ erro: "Rota não encontrada." });
+});
 
+////////////////////////////////////////////////////////////
+app.listen(3000, async () => {
+  const data = new Date();
+  console.log("Servidor iniciado em" + data);
+
+  ////////////////////////////////////////////////////////////
   const conexao = await pool.getConnection();
-  console.log(conexao.threadId);
+  console.log(
+    "Conexão com o banco de dados estabelecida. Thread ID:",
+    conexao.threadId
+  );
   conexao.release();
 });
