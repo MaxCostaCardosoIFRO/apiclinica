@@ -1,7 +1,7 @@
 import pool from "./conexao.js";
 
 ////////////////////////////////////////////////////////////
-async function executaQuery(conexao, query) {
+async function executarQuery(conexao, query) {
   const [resultado] = await conexao.query(query);
   return resultado;
 }
@@ -14,7 +14,7 @@ async function listarTodosMedicos() {
     FROM medicos m 
     JOIN especialidades e ON m.especialidade = e.id 
     ORDER BY m.nome ASC`;
-  const medicos = await executaQuery(conexao, query);
+  const medicos = await executarQuery(conexao, query);
   conexao.release();
 
   if (medicos.length === 0) {
