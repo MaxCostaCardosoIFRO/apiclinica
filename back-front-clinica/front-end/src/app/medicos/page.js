@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from "react";
-const urlPadrao = "http://localhost:9000/medicos";
+const urlPadrao = "http://localhost:3000/medicos";
 
 export default function medicos() {
     const [medicos, setMedicos] = useState([]);
